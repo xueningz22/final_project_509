@@ -1,3 +1,5 @@
+/* global lctypes Promise */
+
 const map = L.map('map').setView([34.05, -118.2], 10);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -12,13 +14,13 @@ const dataLayer = L.tileLayer(tileURL, {
   interactive: true,
   bounds: [
     [34.34230217446123, -118.67156982421876],
-    [33.70263528325575, -118.15383911132814]
-  ]
+    [33.70263528325575, -118.15383911132814],
+  ],
 }).addTo(map);
 
-function timeout(t) {
-  return new Promise(resolve => setTimeout(resolve, t));
-}
+// function timeout(t) {
+//   return new Promise(resolve => setTimeout(resolve, t));
+// }
 
 function isImageLoaded(img) {
   return new Promise((resolve, reject) => {
@@ -26,8 +28,8 @@ function isImageLoaded(img) {
       resolve();
     }
 
-    img.addEventListener('load', () => { resolve(); });
-    img.addEventListener('error', () => { reject(); });
+    img.addEventListener('load', () => { resolve() });
+    img.addEventListener('error', () => { reject() });
   });
 }
 
@@ -38,7 +40,7 @@ map.on('mousemove', async function (e) {
 
   // Get the coordinates of the tile that was clicked.
   // The following is adapted from https://stackoverflow.com/a/37018281/123776
-  const tileSize = {x: 256, y: 256};
+  const tileSize = { x: 256, y: 256 };
   const pixelPoint = map.project(e.latlng, map.getZoom()).floor();
   let coords = pixelPoint.unscaleBy(tileSize).floor();
   coords.z = Math.floor(map.getZoom());
@@ -55,14 +57,14 @@ map.on('mousemove', async function (e) {
   dataLayer._tileCanvases = dataLayer._tileCanvases || {};
   let tileCanvasInfo = dataLayer._tileCanvases[tileId];
   if (!tileCanvasInfo) {
-    tileCanvasInfo = dataLayer._tileCanvases[tileId] = {lock: true};
+    tileCanvasInfo = dataLayer._tileCanvases[tileId] = { lock: true };
 
     if (dataLayer._tooltip) {
       dataLayer._tooltip.close();
       dataLayer._tooltip = null;
     }
 
-    if (!dataLayer._tiles[tileId]) { return; }
+    if (!dataLayer._tiles[tileId]) { return }
 
     const tileImg = dataLayer._tiles[tileId].el;
     await isImageLoaded(tileImg);
@@ -70,11 +72,11 @@ map.on('mousemove', async function (e) {
     tileCanvas.width = 256;
     tileCanvas.height = 256;
 
-    const ctx = tileCanvas.getContext('2d', {willReadFrequently: true});
+    const ctx = tileCanvas.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(tileImg, 0, 0);
 
     tileCanvasInfo.canvas = tileCanvas;
-    tileCanvasInfo.ctx = ctx
+    tileCanvasInfo.ctx = ctx;
     dataLayer._tileCanvases[tileId] = tileCanvasInfo;
 
     delete tileCanvasInfo.lock;
@@ -90,8 +92,8 @@ map.on('mousemove', async function (e) {
   const color = `RGBA(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${pixel[3]})`;
   const lctype = lctypes[color];
   if (!anyvalues.has(color)) {
-    anyvalues.add(color)
-    console.log(color)
+    anyvalues.add(color);
+    console.log(color);
   }
 
   if (!dataLayer._tooltip) {
@@ -100,8 +102,8 @@ map.on('mousemove', async function (e) {
       noWrap: true,
       offset: L.point(0, 0),
       direction: 'top',
-      permanent: false
-    })
+      permanent: false,
+    });
   }
   dataLayer._tooltip.close();
   if(lctype) {
